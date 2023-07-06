@@ -1,15 +1,16 @@
-#include "../inc/create.cpp"
+#include "../inc/create.hpp"
 #include <cstdlib>
 #include <ostream>
 #include <std-k.hpp>
-#include<stdio.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int main(int argc, char** argv) {
     int HelpFlag = 0;
     int VersionFlag = 0;
     int CreateFlag = 0;
     int AddFlag = 0;
+    int MainFlag = 0;
     std::string Type = "";
     std::string Name = "";
     int opt;
@@ -20,6 +21,7 @@ int main(int argc, char** argv) {
         { "version", no_argument, &VersionFlag, 1 },
         { "create", no_argument, &CreateFlag, 1 },
         { "add", no_argument, &AddFlag, 1 },
+        { "add", no_argument, &MainFlag, 1 },
         { "type", required_argument, NULL, 't' },
         { "name", required_argument, NULL, 'n' },
         { 0 }
@@ -27,7 +29,7 @@ int main(int argc, char** argv) {
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcat:n:", Opts, 0);
+        opt = getopt_long(argc, argv, "hvcamt:n:", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -35,12 +37,6 @@ int main(int argc, char** argv) {
                 Usage();;
                 return EXIT_FAILURE;
             }
-            /* if(CreateFlag || AddFlag) { */
-            /*     if(Type == "" || Name == "") { */
-            /*         Usage("Requires type and name to be passed"); */
-            /*         return EXIT_FAILURE; */
-            /*     } */
-            /* } */
             break;
         } 
 
@@ -62,6 +58,9 @@ int main(int argc, char** argv) {
             break;
         case 'a':
             AddFlag = 1;
+            break;
+        case 'm':
+            MainFlag = 1;
             break;
         case '?':
             /* A return value of '?' indicates that an option was malformed.
@@ -87,12 +86,19 @@ int main(int argc, char** argv) {
 
     if(CreateFlag) {
         if(Type == "cpp") {
-            SetupDir(Name);
-            BuildFS(Name, Type);
+            try { BuildFS(Name, Type); }
+            catch(const char *Message) {
+                Usage(Message);
+                return EXIT_FAILURE;
+            }
         }
     }
     if(AddFlag) {
-        Add(Name, Type, 0);
+        try { Add(Name, Type, MainFlag); }
+        catch(const char *Message) {
+            Usage(Message);
+            return EXIT_FAILURE;
+        }
     }
 
     return EXIT_SUCCESS;
@@ -118,6 +124,7 @@ void SetupDir(std::string Name) {
 }
 
 void BuildFS(std::string Name, std::string Type) {
+    SetupDir(Name);
     Add(Name, "cpp", 1);
     Add("config", "cpp", 0);
     Add(Name, "cmake", 0);
@@ -129,7 +136,6 @@ void BuildFS(std::string Name, std::string Type) {
 }
 
 void Add(std::string Name, std::string Type, bool Main) {
-    std::cout << "e\n";
     if(Type == "cpp") {
         k::MkDir("inc");
         k::MkDir("src");
@@ -139,15 +145,16 @@ void Add(std::string Name, std::string Type, bool Main) {
                                 + LicenseFooterSlash, "inc/config.hpp");
             Git("add inc/config.hpp");
         } else {
+            if(Name == "") throw "Passing a name is required for this operation";
             if(Main) { // TODO add classes/stucts
-                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n\n \
-                                    int main(int argc, char** argv) { \n\treturn 0;\n}" \
+                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n\n" \
+                                    + "int main(int argc, char** argv) { \n\treturn 0;\n}" \
                                     + LicenseFooterSlash, "src/" + Name + ".cpp");
                 k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
                                     + "\n\n#include \"config.hpp\"\n\n#endif" \
                                     + LicenseFooterSlash, "inc/" + Name + ".hpp");
             } else {
-                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n" \
+                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"" \
                                     + LicenseFooterSlash, "src/" + Name + ".cpp");
                 k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
                                     + "\n\n#endif" + LicenseFooterSlash, "inc/" + Name + ".hpp");
@@ -156,6 +163,7 @@ void Add(std::string Name, std::string Type, bool Main) {
             Git("add inc/" + Name + ".hpp");
         }
     } else if(Type == "cmake") {
+        if(Name == "") throw "Passing a name is required for this operation";
         k::WriteFileLines(Install + LicenseFooterHash, "install.sh");
         int result = k::ExecCmd("chmod +x install.sh");
         k::WriteFileLines(CMake1 + Name + CMake2 + Name + " src/" \
@@ -176,23 +184,26 @@ void Add(std::string Name, std::string Type, bool Main) {
         k::WriteFileLines(GitIgnore, ".gitignore");
         Git("add .gitignore");
     } else if(Type == "readme") {
+        if(Name == "") throw "Passing a name is required for this operation";
         std::string ReadMe = "#" + Name + "\n\n" + ReadMe1 + Name + ReadMe2 + Name + ReadMe3;
         k::WriteFileLines(ReadMe, "README.md");
         Git("add README.md");
     } else if(Type == "bash" || Type == "sh") {
+        if(Name == "") throw "Passing a name is required for this operation";
         std::string Bash = "#!/bin/bash\n";
         k::WriteFileLines(Bash, Name + ".sh");
         int result = k::ExecCmd("chmod +x " + Name + ".sh");
         Git("add" + Name + ".sh");
-    }
+    } else
+        throw "Passing a type is required for this operation";
+    return;
 }
 
 bool Git(std::string Cmd) {
-    Cmd =  "git " + Cmd;
-    std::cout << "cmd: " << Cmd << std::endl;
+    Cmd =  "git " + Cmd + Sh;
     std::string Output;
     int result = k::ExecCmd(Cmd, Output);
-    std::cout << "0: " << Output << std::endl;
+    /* std::cout << "0: " << Output << std::endl; */
     return result;
 }
 

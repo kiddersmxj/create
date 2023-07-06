@@ -13,7 +13,8 @@ options:
     -t / --type         designate langage (cpp)
     -n / --name         name program
     -c / --create       create program and fs
-)";
+    -a / --add          add file (respective header)
+    -m / --main         for c/cpp add a main (respective header))";
 const std::string Version = "0.0.0";
 const std::string BaseURL = getenv("ghk");
 const std::string Sh = R"( > /dev/null 2>&1)";
