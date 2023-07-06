@@ -2,10 +2,12 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#include <format>
+#include <ctime>
 
 const std::string ProgramName = "create";
-const std::string Year = std::format("{:%Y}", std::chrono::system_clock::now());
+const time_t now = time(0);
+const tm *ltm = localtime(&now);
+const std::string Year = std::to_string(1900 + ltm->tm_year);
 const std::string UsageNotes = R"(usage: create [ -t/--type="language" ]
 options:
     -h / --help         show help and usage notes
