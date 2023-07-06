@@ -19,9 +19,9 @@ endif()
 # ------------------------------------------------------------------------------
 
 # Set cpp standard (with flags for gh actions)
-set (CMAKE_CXX_STANDARD 20)
-set(CXXFLAGS "-std=c++20")
-set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
+# set (CMAKE_CXX_STANDARD 20)
+# set(CXXFLAGS "-std=c++20")
+# set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 
 project(create
   LANGUAGES CXX
@@ -44,3 +44,4 @@ link_directories(${std-k_BINARY_DIR})
 target_link_libraries(create
     PUBLIC std-k
 )
+target_compile_features(create PUBLIC cxx_std_20)
