@@ -13,5 +13,6 @@ void Usage(std::string Message);
 void PrintVersion();
 void SetupDir(std::string Name);
 void BuildFS(std::string Name, std::string Type);
+void Add(std::string Name, std::string Type, bool Main);
 
 #endif
