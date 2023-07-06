@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <format>
 
 const std::string ProgramName = "create";
 const std::string Year = std::format("{:%Y}", std::chrono::system_clock::now());
@@ -37,6 +38,11 @@ if(NOT std-k_POPULATED)
 endif()
  
 # ------------------------------------------------------------------------------
+
+# Set cpp standard (with flags for gh actions)
+set (CMAKE_CXX_STANDARD 20)
+set(CXXFLAGS "-std=c++20")
+set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 
 project()" }; // Name
 
