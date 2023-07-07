@@ -2,8 +2,10 @@
 #include <bits/getopt_core.h>
 #include <cstdlib>
 #include <ostream>
+#include <sstream>
 #include <std-k.hpp>
 #include <stdio.h>
+#include <string>
 #include <unistd.h>
 
 int main(int argc, char** argv) {
@@ -11,6 +13,8 @@ int main(int argc, char** argv) {
     int VersionFlag = 0;
     int CreateFlag = 0;
     int AddFlag = 0;
+    int ForceFlag = 0;
+    bool Force = 0;
     int AdditionalFlag = 0;
     std::string Additional = "";
     std::string Type = "";
@@ -23,6 +27,7 @@ int main(int argc, char** argv) {
         { "version", no_argument, &VersionFlag, 1 },
         { "create", no_argument, &CreateFlag, 1 },
         { "add", no_argument, &AddFlag, 1 },
+        { "force", no_argument, &ForceFlag, 1 },
         { "main", no_argument, &AdditionalFlag, 1 },
         { "class", no_argument, &AdditionalFlag, 1 },
         { "struct", no_argument, &AdditionalFlag, 1 },
@@ -33,7 +38,7 @@ int main(int argc, char** argv) {
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcamCSt:n:", Opts, 0);
+        opt = getopt_long(argc, argv, "hvcafmCSt:n:", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -72,6 +77,10 @@ int main(int argc, char** argv) {
         case 'a':
             AddFlag = 1;
             break;
+        case 'f':
+            ForceFlag = 1;
+            Force = 1;
+            break;
         case 'm':
             AdditionalFlag++;
             Additional = "main";
@@ -105,10 +114,15 @@ int main(int argc, char** argv) {
         PrintVersion();
         return EXIT_SUCCESS;
     }
+    if(ForceFlag) Force = 1;
 
     if(CreateFlag) {
         if(Type == "cpp") {
-            try { BuildFS(Name, Type); }
+            try { BuildFS(Name, Type, Force); }
+            catch(std::string Message) {
+                Usage(Message);
+                return EXIT_FAILURE;
+            }
             catch(const char *Message) {
                 Usage(Message);
                 return EXIT_FAILURE;
@@ -116,7 +130,11 @@ int main(int argc, char** argv) {
         }
     }
     if(AddFlag) {
-        try { Add(Name, Type, Additional); }
+        try { Add(Name, Type, Additional, Force); }
+        catch(std::string Message) {
+            Usage(Message);
+            return EXIT_FAILURE;
+        }
         catch(const char *Message) {
             Usage(Message);
             return EXIT_FAILURE;
@@ -145,87 +163,86 @@ void SetupDir(std::string Name) {
     chdir(Path);
 }
 
-void BuildFS(std::string Name, std::string Type) {
+void BuildFS(std::string Name, std::string Type, bool Force) {
     SetupDir(Name);
-    Add(Name, "cpp", "main");
-    Add("config", "cpp", "");
-    Add(Name, "cmake", "");
-    Add(Name, "readme", "");
-    Add("", "gdb", "");
-    Add("", "gitignore", "");
-    Add("", "license", "");
+    Add(Name, "cpp", "main", Force);
+    Add("config", "cpp", "", Force);
+    Add(Name, "cmake", "", Force);
+    Add(Name, "readme", "", Force);
+    Add("", "gdb", "", Force);
+    Add("", "gitignore", "", Force);
+    Add("", "license", "", Force);
     CreateRepo(Name);
 }
 
-void Add(std::string Name, std::string Type, std::string Additional) {
+void Add(std::string Name, std::string Type, std::string Additional, bool Force) {
     if(Type == "cpp") {
-        k::MkDir("inc");
-        k::MkDir("src");
         if(Name == "config") { // config file
-            k::WriteFileLines("#ifndef Kconfig\n#define Kconfig\
+            CreateFile("#ifndef Kconfig\n#define Kconfig\
                                 \n\n#include <iostream>\n\n#endif" \
-                                + LicenseFooterSlash, "inc/config.hpp");
+                                + LicenseFooterSlash, "inc/", "config.hpp", Force);
             Git("add inc/config.hpp");
         } else {
             if(Name == "") throw "Passing a name is required for this operation";
             if(Additional == "main") { // TODO add classes/stucts
-                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n\n" \
+                CreateFile("#include \"../inc/" + Name + ".hpp\"\n\n" \
                                     + "int main(int argc, char** argv) { \n\treturn 0;\n}" \
-                                    + LicenseFooterSlash, "src/" + Name + ".cpp");
-                k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                                    + LicenseFooterSlash, "src/", Name + ".cpp", Force);
+                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
                                     + "\n\n#include \"config.hpp\"\n\n#endif" \
-                                    + LicenseFooterSlash, "inc/" + Name + ".hpp");
+                                    + LicenseFooterSlash, "inc/", Name + ".hpp", Force);
             } else if(Additional == "class") {
-                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n\n" \
+                CreateFile("#include \"../inc/" + Name + ".hpp\"\n\n" \
                                     + Name + "::" + Name + "() {\n}"
-                                    + LicenseFooterSlash, "src/" + Name + ".cpp");
-                k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\nclass " + Name + " {\n\tpublic:\n\t\t" + Name + "();" \
-                                    + "\n\t\t~" + Name + "();\n\t private:\n};" \
-                                    + "\n\n#endif" + LicenseFooterSlash, "inc/" + Name + ".hpp");
+                                    + LicenseFooterSlash, "src/", Name + ".cpp", Force);
+                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                                    + "\n\nclass " + Name + " {\n    public:\n        " \
+                                    + Name + "();" + "\n        ~" + Name + "();\n    private:\n};" \
+                                    + "\n\n#endif" + LicenseFooterSlash, "inc/", \
+                                    Name + ".hpp", Force);
             } else if(Additional == "struct") {
-                k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
                                     + "\n\ntypedef struct {\n} " + Name + ";" \
-                                    + "\n\n#endif" + LicenseFooterSlash, "inc/" + Name + ".hpp");
+                                    + "\n\n#endif" + LicenseFooterSlash, "inc/", \
+                                    Name + ".hpp", Force);
             } else {
-                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"" \
-                                    + LicenseFooterSlash, "src/" + Name + ".cpp");
-                k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\n#endif" + LicenseFooterSlash, "inc/" + Name + ".hpp");
+                CreateFile("#include \"../inc/" + Name + ".hpp\"" \
+                                    + LicenseFooterSlash, "src/", Name + ".cpp", Force);
+                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                                    + "\n\n#endif" + LicenseFooterSlash, "inc/", \
+                                    Name + ".hpp", Force);
             }
             Git("add src/" + Name + ".cpp");
             Git("add inc/" + Name + ".hpp");
         }
     } else if(Type == "cmake") {
         if(Name == "") throw "Passing a name is required for this operation";
-        k::WriteFileLines(Install + LicenseFooterHash, "install.sh");
-        int result = k::ExecCmd("chmod +x install.sh");
-        k::WriteFileLines(CMake1 + Name + CMake2 + Name + " src/" \
+        CreateFile(CMake1 + Name + CMake2 + Name + " src/" \
                             + Name + ".cpp" + CMake3 + Name + CMake4 + Name + CMake5 \
-                            + Name + CMake6 + LicenseFooterHash, "CMakeLists.txt");
-        k::MkDir(".github");
-        k::MkDir(".github/workflows");
-        k::WriteFileLines(Action, ".github/workflows/cmake.yml");
+                            + Name + CMake6 + LicenseFooterHash, "CMakeLists.txt", Force);
+        CreateFile(Install + LicenseFooterHash, "install.sh", Force);
+        int result = k::ExecCmd("chmod +x install.sh");
+        CreateFile(Action, ".github/workflows/", "cmake.yml", Force);
         Git("add CMakeLists.txt");
         Git("add .github");
+        Git("add install.sh");
     } else if(Type == "license") {
-        k::WriteFileLines(License, "LICENSE");
+        CreateFile(License, "LICENSE", Force);
         Git("add LICENSE");
     } else if(Type == "gdb") {
-        k::WriteFileLines(GDB, ".gdbinit");
+        CreateFile(GDB, ".gdbinit", Force);
         Git("add .gdbinit");
     } else if(Type == "gitignore") {
-        k::WriteFileLines(GitIgnore, ".gitignore");
+        CreateFile(GitIgnore, ".gitignore", Force);
         Git("add .gitignore");
     } else if(Type == "readme") {
         if(Name == "") throw "Passing a name is required for this operation";
-        std::string ReadMe = "# " + Name + " " + ReadMe1 + Name + ReadMe2 + Name + ReadMe3;
-        k::WriteFileLines(ReadMe, "README.md");
+        CreateFile("# " + Name + " " + ReadMe1 + Name + ReadMe2 \
+                + Name + ReadMe3, "README.md", Force);
         Git("add README.md");
     } else if(Type == "bash" || Type == "sh") {
         if(Name == "") throw "Passing a name is required for this operation";
-        std::string Bash = "#!/bin/bash\n";
-        k::WriteFileLines(Bash, Name + ".sh");
+        CreateFile("#!/bin/bash\n", Name + ".sh", Force);
         int result = k::ExecCmd("chmod +x " + Name + ".sh");
         Git("add" + Name + ".sh");
     } else
@@ -251,4 +268,44 @@ bool CreateRepo(std::string Name) {
     Git("branch  --set-upstream-to=master/main main");
     Git("push --set-upstream master main");
     return 0;
+}
+
+bool Exists(const char *Name) {
+    /* std::ifstream f(Name); */
+    /* return f.good(); */
+    struct stat buffer;
+    if(stat(Name, &buffer) == 0) return 1;
+    return 0;
+}
+
+bool Exists(std::string Name) {
+    struct stat buffer;
+    if(stat(Name.c_str(), &buffer) == 0) return 1;
+    return 0;
+}
+
+void CreateFile(std::string Content, std::string Name, bool Force) {
+    if(!Force)
+        if(Exists(Name)) throw "A '" + Name + "' file exists! If you are sure you want to do this use -f / --force.";
+    k::WriteFileLines(Content, Name);
+}
+
+void CreateFile(std::string Content, std::string Path, std::string Name, bool Force) {
+    if(!Force)
+        if(Exists(Path + Name)) throw "A '" + Path + Name + "' file exists! If you are sure you want to do this use -f / --force.";
+    std::string Seg;
+    std::stringstream P(Path);
+    std::vector<std::string> IncrementingPath;
+    while(std::getline(P, Seg, '/')) {
+        if(Seg == Name) break;
+        IncrementingPath.push_back(Seg);
+    }
+    std::string path = "";
+    for(std::string p: IncrementingPath) {
+        if(path != "")
+            path = path + "/" + p;
+        else path = p;
+        k::MkDir(path);
+    }
+    k::WriteFileLines(Content, Path + "/" + Name);
 }
