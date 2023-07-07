@@ -13,7 +13,7 @@ void Usage(std::string Message);
 void PrintVersion();
 void SetupDir(std::string Name);
 void BuildFS(std::string Name, std::string Type);
-void Add(std::string Name, std::string Type, bool Main);
+void Add(std::string Name, std::string Type, std::string Additional);
 bool Git(std::string Cmd);
 bool CreateRepo(std::string Name);
 

@@ -1,4 +1,5 @@
 #include "../inc/create.hpp"
+#include <bits/getopt_core.h>
 #include <cstdlib>
 #include <ostream>
 #include <std-k.hpp>
@@ -10,7 +11,8 @@ int main(int argc, char** argv) {
     int VersionFlag = 0;
     int CreateFlag = 0;
     int AddFlag = 0;
-    int MainFlag = 0;
+    int AdditionalFlag = 0;
+    std::string Additional = "";
     std::string Type = "";
     std::string Name = "";
     int opt;
@@ -21,7 +23,9 @@ int main(int argc, char** argv) {
         { "version", no_argument, &VersionFlag, 1 },
         { "create", no_argument, &CreateFlag, 1 },
         { "add", no_argument, &AddFlag, 1 },
-        { "add", no_argument, &MainFlag, 1 },
+        { "main", no_argument, &AdditionalFlag, 1 },
+        { "class", no_argument, &AdditionalFlag, 1 },
+        { "struct", no_argument, &AdditionalFlag, 1 },
         { "type", required_argument, NULL, 't' },
         { "name", required_argument, NULL, 'n' },
         { 0 }
@@ -29,12 +33,21 @@ int main(int argc, char** argv) {
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcamt:n:", Opts, 0);
+        opt = getopt_long(argc, argv, "hvcamCSt:n:", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
             if(HelpFlag && VersionFlag) {
                 Usage();;
+                return EXIT_FAILURE;
+            } else if(CreateFlag) {
+                if(Additional == "main") {
+                    Usage("Main will be created with filesystem. Ommitting -m");
+                } else if(Additional != "") {
+                    Usage("Additonal files can be added post-creation of fs. Omitting");
+                }
+            } else if(AdditionalFlag > 1) {
+                Usage("Only one additonal (eg. -C, -S...) can be used at a time");
                 return EXIT_FAILURE;
             }
             break;
@@ -60,7 +73,16 @@ int main(int argc, char** argv) {
             AddFlag = 1;
             break;
         case 'm':
-            MainFlag = 1;
+            AdditionalFlag++;
+            Additional = "main";
+            break;
+        case 'C':
+            AdditionalFlag++;
+            Additional = "class";
+            break;
+        case 'S':
+            AdditionalFlag++;
+            Additional = "struct";
             break;
         case '?':
             /* A return value of '?' indicates that an option was malformed.
@@ -94,7 +116,7 @@ int main(int argc, char** argv) {
         }
     }
     if(AddFlag) {
-        try { Add(Name, Type, MainFlag); }
+        try { Add(Name, Type, Additional); }
         catch(const char *Message) {
             Usage(Message);
             return EXIT_FAILURE;
@@ -125,17 +147,17 @@ void SetupDir(std::string Name) {
 
 void BuildFS(std::string Name, std::string Type) {
     SetupDir(Name);
-    Add(Name, "cpp", 1);
-    Add("config", "cpp", 0);
-    Add(Name, "cmake", 0);
-    Add(Name, "readme", 0);
-    Add("", "gdb", 0);
-    Add("", "gitignore", 0);
-    Add("", "license", 0);
+    Add(Name, "cpp", "main");
+    Add("config", "cpp", "");
+    Add(Name, "cmake", "");
+    Add(Name, "readme", "");
+    Add("", "gdb", "");
+    Add("", "gitignore", "");
+    Add("", "license", "");
     CreateRepo(Name);
 }
 
-void Add(std::string Name, std::string Type, bool Main) {
+void Add(std::string Name, std::string Type, std::string Additional) {
     if(Type == "cpp") {
         k::MkDir("inc");
         k::MkDir("src");
@@ -146,13 +168,25 @@ void Add(std::string Name, std::string Type, bool Main) {
             Git("add inc/config.hpp");
         } else {
             if(Name == "") throw "Passing a name is required for this operation";
-            if(Main) { // TODO add classes/stucts
+            if(Additional == "main") { // TODO add classes/stucts
                 k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n\n" \
                                     + "int main(int argc, char** argv) { \n\treturn 0;\n}" \
                                     + LicenseFooterSlash, "src/" + Name + ".cpp");
                 k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
                                     + "\n\n#include \"config.hpp\"\n\n#endif" \
                                     + LicenseFooterSlash, "inc/" + Name + ".hpp");
+            } else if(Additional == "class") {
+                k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"\n\n" \
+                                    + Name + "::" + Name + "() {\n}"
+                                    + LicenseFooterSlash, "src/" + Name + ".cpp");
+                k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                                    + "\n\nclass " + Name + " {\n\tpublic:\n\t\t" + Name + "();" \
+                                    + "\n\t\t~" + Name + "();\n\t private:\n};" \
+                                    + "\n\n#endif" + LicenseFooterSlash, "inc/" + Name + ".hpp");
+            } else if(Additional == "struct") {
+                k::WriteFileLines("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                                    + "\n\ntypedef struct {\n} " + Name + ";" \
+                                    + "\n\n#endif" + LicenseFooterSlash, "inc/" + Name + ".hpp");
             } else {
                 k::WriteFileLines("#include \"../inc/" + Name + ".hpp\"" \
                                     + LicenseFooterSlash, "src/" + Name + ".cpp");
