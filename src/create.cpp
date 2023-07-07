@@ -185,7 +185,7 @@ void Add(std::string Name, std::string Type, bool Main) {
         Git("add .gitignore");
     } else if(Type == "readme") {
         if(Name == "") throw "Passing a name is required for this operation";
-        std::string ReadMe = "#" + Name + "\n\n" + ReadMe1 + Name + ReadMe2 + Name + ReadMe3;
+        std::string ReadMe = "# " + Name + " " + ReadMe1 + Name + ReadMe2 + Name + ReadMe3;
         k::WriteFileLines(ReadMe, "README.md");
         Git("add README.md");
     } else if(Type == "bash" || Type == "sh") {
