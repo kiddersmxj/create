@@ -6,7 +6,7 @@
 
 const std::string ProgramName = "create";
 const time_t now = time(0);
-const tm *ltm = localtime(&now);
+inline const tm *ltm = localtime(&now);
 const std::string Year = std::to_string(1900 + ltm->tm_year);
 const std::string UsageNotes = R"(usage: create [ -t/--type="language" ]
 options:
@@ -16,7 +16,9 @@ options:
     -n / --name         name program
     -c / --create       create program and fs
     -a / --add          add file (respective header)
-    -m / --main         for c/cpp add a main (respective header))";
+    -m / --main         for c/cpp add a main & respective header
+    -C / --class        for c/cpp add a class & respective header
+    -S / --struct        for c/cpp add a struct header)";
 const std::string Version = "0.0.0";
 const std::string BaseURL = getenv("ghk");
 const std::string Sh = R"( > /dev/null 2>&1)";
