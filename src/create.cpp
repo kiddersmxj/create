@@ -1,11 +1,5 @@
 #include "../inc/create.hpp"
 #include <bits/getopt_core.h>
-#include <cstdlib>
-#include <ostream>
-#include <sstream>
-#include <std-k.hpp>
-#include <stdio.h>
-#include <string>
 #include <unistd.h>
 
 int main(int argc, char** argv) {
@@ -192,17 +186,21 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
                                     + "\n\n#include \"config.hpp\"\n\n#endif" \
                                     + LicenseFooterSlash, "inc/", Name + ".hpp", Force);
             } else if(Additional == "class") {
+                std::string name = Name;
+                name[0] = toupper(name[0]);
                 CreateFile("#include \"../inc/" + Name + ".hpp\"\n\n" \
-                                    + Name + "::" + Name + "() {\n}"
+                                    + name + "::" + name + "() {\n}"
                                     + LicenseFooterSlash, "src/", Name + ".cpp", Force);
                 CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\nclass " + Name + " {\n    public:\n        " \
-                                    + Name + "();" + "\n        ~" + Name + "();\n    private:\n};" \
+                                    + "\n\nclass " + name + " {\n    public:\n        " \
+                                    + name + "();" + "\n        ~" + name + "();\n    private:\n};" \
                                     + "\n\n#endif" + LicenseFooterSlash, "inc/", \
                                     Name + ".hpp", Force);
             } else if(Additional == "struct") {
+                std::string name = Name;
+                name[0] = toupper(name[0]);
                 CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\ntypedef struct {\n} " + Name + ";" \
+                                    + "\n\ntypedef struct {\n} " + name + ";" \
                                     + "\n\n#endif" + LicenseFooterSlash, "inc/", \
                                     Name + ".hpp", Force);
             } else {
@@ -302,8 +300,7 @@ void CreateFile(std::string Content, std::string Path, std::string Name, bool Fo
     }
     std::string path = "";
     for(std::string p: IncrementingPath) {
-        if(path != "")
-            path = path + "/" + p;
+        if(path != "") path = path + "/" + p;
         else path = p;
         k::MkDir(path);
     }
