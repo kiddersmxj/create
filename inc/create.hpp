@@ -3,6 +3,8 @@
 
 #include "config.hpp"
 
+#include <bits/getopt_core.h>
+#include <unistd.h>
 #include <iostream>
 #include <getopt.h>
 #include <std-k.hpp>
