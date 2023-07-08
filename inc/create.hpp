@@ -8,6 +8,7 @@
 #include <std-k.hpp>
 #include <sys/stat.h>
 #include <fstream>
+#include <sstream>
 
 void Usage();
 void Usage(std::string Message);
