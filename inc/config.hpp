@@ -20,7 +20,7 @@ options:
     -S / --struct       for c/cpp add a struct header
     -f / --force        force even if files exist)";
 const std::vector<std::string> TypeList = { "cpp", "cmake", "license", "gdb", "gitignore", "readme", "bash/sh", "python/py" };
-const std::string Version = "0.0.0";
+const std::string Version = "1.0.0";
 const std::string BaseURL = getenv("ghk");
 const std::string Sh = R"( > /dev/null 2>&1)";
 

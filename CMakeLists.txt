@@ -20,7 +20,7 @@ endif()
 
 project(create
   LANGUAGES CXX
-  VERSION 0.0.0
+  VERSION 1.0.0
 )
 
 add_executable(create src/create.cpp)
