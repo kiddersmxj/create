@@ -18,11 +18,6 @@ endif()
  
 # ------------------------------------------------------------------------------
 
-# Set cpp standard (with flags for gh actions)
-# set (CMAKE_CXX_STANDARD 20)
-# set(CXXFLAGS "-std=c++20")
-# set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
-
 project(create
   LANGUAGES CXX
   VERSION 0.0.0
@@ -45,3 +40,9 @@ target_link_libraries(create
     PUBLIC std-k
 )
 target_compile_features(create PUBLIC cxx_std_20)
+
+# Copyright (c) 2023, Maxamilian Kidd-May
+# All rights reserved.
+
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree. )";
