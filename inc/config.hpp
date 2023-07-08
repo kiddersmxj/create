@@ -44,11 +44,6 @@ endif()
  
 # ------------------------------------------------------------------------------
 
-# Set cpp standard (with flags for gh actions)
-set (CMAKE_CXX_STANDARD 20)
-set(CXXFLAGS "-std=c++20")
-set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
-
 project()" }; // Name
 
 const std::string CMake2 = R"(
@@ -150,8 +145,6 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@master
     - name: Build using CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: ./install.sh)";
 
 const std::string GDB = R"(b Breakpoint)";
