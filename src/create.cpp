@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
             ForceFlag = 1;
             Force = 1;
             break;
-        case 'm':
+        case 'M':
             AdditionalFlag++;
             Additional = "main";
             break;
@@ -107,6 +107,11 @@ int main(int argc, char** argv) {
         return EXIT_SUCCESS;
     }
     if(ForceFlag) Force = 1;
+    if(Type == "list") {
+        std::cout << "Current suported types:" << std::endl;
+        for(std::string s: TypeList)
+            std::cout << "    " << s << std::endl;
+    }
 
     if(CreateFlag) {
         if(Type == "cpp") {

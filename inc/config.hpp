@@ -1,22 +1,25 @@
 #include <iostream>
+#include <vector>
 #include <ctime>
 
 const std::string ProgramName = "create";
 const time_t now = time(0);
 inline const tm *ltm = localtime(&now);
 const std::string Year = std::to_string(1900 + ltm->tm_year);
-const std::string UsageNotes = R"(usage: create [ -t/--type="language" ]
+const std::string UsageNotes = R"(usage: create [ -h/-v ] [ -a/-c ] [ -t language ]
+              [ -n name ] [ -C/-S/-M ] [ -f ]
 options:
     -h / --help         show help and usage notes
     -v / --version      print version and exit
-    -t / --type         designate langage (cpp)
-    -n / --name         name program
+    -t / --type         designate langage (pass '-t list' for list)
+    -n / --name         name program/file
     -c / --create       create program and fs
-    -a / --add          add file (respective header)
+    -a / --add          add file with respective header if required
     -m / --main         for c/cpp add a main & respective header
     -C / --class        for c/cpp add a class & respective header
     -S / --struct       for c/cpp add a struct header
     -f / --force        force even if files exist)";
+const std::vector<std::string> TypeList = { "cpp", "cmake", "license", "gdb", "gitignore", "readme", "bash/sh", "python/py" };
 const std::string Version = "0.0.0";
 const std::string BaseURL = getenv("ghk");
 const std::string Sh = R"( > /dev/null 2>&1)";
