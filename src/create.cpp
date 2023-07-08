@@ -1,6 +1,4 @@
 #include "../inc/create.hpp"
-#include <bits/getopt_core.h>
-#include <unistd.h>
 
 int main(int argc, char** argv) {
     int HelpFlag = 0;
@@ -243,6 +241,10 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
         CreateFile("#!/bin/bash\n", Name + ".sh", Force);
         int result = k::ExecCmd("chmod +x " + Name + ".sh");
         Git("add" + Name + ".sh");
+    } else if(Type == "python" || Type == "py") {
+        if(Name == "") throw "Passing a name is required for this operation";
+        CreateFile(Python, Name + ".py", Force);
+        Git("add" + Name + ".py");
     } else
         throw "Passing a type is required for this operation";
     return;

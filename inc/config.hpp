@@ -157,3 +157,9 @@ options:
 const std::string ReadMe1 = R"([![CMake](https://img.shields.io/github/actions/workflow/status/kiddersmxj/)"; // Name
 const std::string ReadMe2 = R"(/cmake.yml?style=for-the-badge)](https://github.com/kiddersmxj/)"; // Name
 const std::string ReadMe3 = R"(/actions/workflows/cmake.yml))";
+
+const std::string Python = R"(#!/usr/bin/python
+
+if __name__ == "__main__":
+   main()
+)";
