@@ -105,9 +105,9 @@ int main(int argc, char** argv) {
     }
     if(ForceFlag) Force = 1;
     if(Type == "list") {
-        std::cout << "Current suported types:" << std::endl;
+        /* std::cout << "Current suported types:" << std::endl; */
         for(std::string s: TypeList)
-            std::cout << "    " << s << std::endl;
+            std::cout << s << std::endl;
     }
 
     if(CreateFlag) {
