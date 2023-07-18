@@ -58,7 +58,7 @@ const std::string CMake3 = R"()
 target_include_directories()"; // Name
 
 const std::string CMake4 = R"( 
-    PRIVATE src
+    PRIVATE inc
     SHARED ${std-k_SOURCE_DIR}/inc
 )
 
@@ -164,8 +164,7 @@ const std::string ReadMe3 = R"(/actions/workflows/cmake.yml))";
 const std::string Python = R"(#!/usr/bin/python
 
 if __name__ == "__main__":
-   main()
-)";
+   main())";
 
 // Copyright (c) 2023, Maxamilian Kidd-May
 // All rights reserved.

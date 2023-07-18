@@ -26,7 +26,7 @@ project(create
 add_executable(create src/create.cpp)
 
 target_include_directories(create
-    PRIVATE src
+    PRIVATE inc
     SHARED ${std-k_SOURCE_DIR}/inc
 )
 

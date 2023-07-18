@@ -86,13 +86,10 @@ int main(int argc, char** argv) {
             Additional = "struct";
             break;
         case '?':
-            /* A return value of '?' indicates that an option was malformed.
-             * this could mean that an unrecognized option was given, or that an
-             * option which requires an argument did not include an argument.
-             */
             Usage();
             return EXIT_FAILURE;
         default:
+            Usage();
             break;
         }
     }
