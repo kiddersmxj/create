@@ -2,6 +2,8 @@
 #include <vector>
 #include <ctime>
 
+#include <std-k.hpp>
+
 const std::string ProgramName = "create";
 const time_t now = time(0);
 inline const tm *ltm = localtime(&now);
@@ -23,6 +25,8 @@ const std::vector<std::string> TypeList = { "cpp", "cmake", "license", "gdb", "g
 const std::string Version = "1.0.0";
 const std::string BaseURL = getenv("ghk");
 const std::string Sh = R"( > /dev/null 2>&1)";
+
+const std::string BasePath = HOME + "/devel/";
 
 const std::string CMake1 = { R"(cmake_minimum_required (VERSION 3.11)
  

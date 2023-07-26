@@ -152,9 +152,9 @@ void PrintVersion() {
 }
 
 void SetupDir(std::string Name) {
-    k::MkDir(Name);
-    const char *Path = Name.c_str();
-    chdir(Path);
+    const std::string Path = BasePath + Name;
+    k::MkDir(Path);
+    chdir(Path.c_str());
 }
 
 void BuildFS(std::string Name, std::string Type, bool Force) {
