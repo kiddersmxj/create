@@ -1,22 +1,4 @@
 cmake_minimum_required (VERSION 3.11)
- 
-# --- Fetch libs --------------------------------------------------------------
-
-# include(FetchContent)
-
-# set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
-# FetchContent_Declare(std-k
-#   GIT_REPOSITORY https://github.com/kiddersmxj/std-k
-#   GIT_TAG main
-# )
- 
-# FetchContent_GetProperties(std-k)
-# if(NOT std-k_POPULATED)
-#   FetchContent_Populate(std-k)
-#   add_subdirectory(${std-k_SOURCE_DIR} ${std-k_BINARY_DIR})
-# endif()
- 
-# ------------------------------------------------------------------------------
 
 project(create
   LANGUAGES CXX
@@ -25,12 +7,10 @@ project(create
 
 add_executable(create src/create.cpp)
 
-# Find the shared_library package
 find_package(std-k REQUIRED)
 
 target_include_directories(create
     PRIVATE inc
-    # SHARED ${std-k_SOURCE_DIR}/inc
 )
 
 install(
@@ -38,7 +18,6 @@ install(
     DESTINATION /usr/local/bin/
 )
 
-# link_directories(${std-k_BINARY_DIR})
 target_link_libraries(create
     PRIVATE std-k
 )
