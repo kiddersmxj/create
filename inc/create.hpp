@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
 
 void Usage();
 void Usage(std::string Message);
@@ -24,6 +25,8 @@ bool Exists(const char *Name);
 bool Exists(std::string Name);
 void CreateFile(std::string Content, std::string Name, bool Force);
 void CreateFile(std::string Content, std::string Path, std::string Name, bool Force);
+std::string GetContent(std::string FileStandard, std::string Name);
+std::string GetContent(std::string FileStandard);
 
 #endif
 

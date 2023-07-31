@@ -1,4 +1,5 @@
 #include "../inc/create.hpp"
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
     int HelpFlag = 0;
@@ -6,6 +7,7 @@ int main(int argc, char** argv) {
     int CreateFlag = 0;
     int AddFlag = 0;
     int ForceFlag = 0;
+    int TestFlag = 0;
     bool Force = 0;
     int AdditionalFlag = 0;
     std::string Additional = "";
@@ -25,6 +27,7 @@ int main(int argc, char** argv) {
         { "struct", no_argument, &AdditionalFlag, 1 },
         { "type", required_argument, NULL, 't' },
         { "name", required_argument, NULL, 'n' },
+        { "test", no_argument, &TestFlag, 1 },
         { 0 }
     };
 
@@ -135,6 +138,12 @@ int main(int argc, char** argv) {
         }
     }
 
+    if(TestFlag) {
+        GetContent("CMakeLists.txt", "ajj");
+        GetContent("LICENSE");
+        GetContent("install.sh");
+    }
+
     return EXIT_SUCCESS;
 }
 
@@ -157,6 +166,12 @@ void SetupDir(std::string Name) {
     chdir(Path.c_str());
 }
 
+void SetupDirinDir(std::string Name) {
+    const std::string Path = Name;
+    k::MkDir(Path);
+    chdir(Path.c_str());
+}
+
 void BuildFS(std::string Name, std::string Type, bool Force) {
     SetupDir(Name);
     Add(Name, "cpp", "main", Force);
@@ -172,19 +187,13 @@ void BuildFS(std::string Name, std::string Type, bool Force) {
 void Add(std::string Name, std::string Type, std::string Additional, bool Force) {
     if(Type == "cpp") {
         if(Name == "config") { // config file
-            CreateFile("#ifndef Kconfig\n#define Kconfig\
-                                \n\n#include <iostream>\n\n#endif" \
-                                + LicenseFooterSlash, "inc/", "config.hpp", Force);
+            CreateFile(GetContent("config.hpp", Name), "inc/" , Name + ".hpp", Force);
             Git("add inc/config.hpp");
         } else {
             if(Name == "") throw "Passing a name is required for this operation";
             if(Additional == "main") { // TODO add classes/stucts
-                CreateFile("#include \"../inc/" + Name + ".hpp\"\n\n" \
-                                    + "int main(int argc, char** argv) { \n\treturn 0;\n}" \
-                                    + LicenseFooterSlash, "src/", Name + ".cpp", Force);
-                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\n#include \"config.hpp\"\n\n#endif" \
-                                    + LicenseFooterSlash, "inc/", Name + ".hpp", Force);
+                CreateFile(GetContent("main.cpp", Name), "src/", Name + ".cpp", Force);
+                CreateFile(GetContent("main.hpp", Name), "inc/", Name + ".hpp", Force);
             } else if(Additional == "class") {
                 std::string name = Name;
                 name[0] = toupper(name[0]);
@@ -204,28 +213,23 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
                                     + "\n\n#endif" + LicenseFooterSlash, "inc/", \
                                     Name + ".hpp", Force);
             } else {
-                CreateFile("#include \"../inc/" + Name + ".hpp\"" \
-                                    + LicenseFooterSlash, "src/", Name + ".cpp", Force);
-                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\n#endif" + LicenseFooterSlash, "inc/", \
-                                    Name + ".hpp", Force);
+                CreateFile(GetContent("source.cpp", Name), "src/", Name + ".cpp", Force);
+                CreateFile(GetContent("header.hpp", Name), "inc/", Name + ".hpp", Force);
             }
             Git("add src/" + Name + ".cpp");
             Git("add inc/" + Name + ".hpp");
         }
     } else if(Type == "cmake") {
         if(Name == "") throw "Passing a name is required for this operation";
-        CreateFile(CMake1 + Name + CMake2 + Name + " src/" \
-                            + Name + ".cpp" + CMake3 + Name + CMake4 + Name + CMake5 \
-                            + Name + CMake6 + LicenseFooterHash, "CMakeLists.txt", Force);
-        CreateFile(Install + LicenseFooterHash, "install.sh", Force);
+        CreateFile(GetContent("CMakeLists.txt", Name), "CMakeLists.txt", Force);
+        CreateFile(GetContent("install.sh"), "install.sh", Force);
         int result = k::ExecCmd("chmod +x install.sh");
-        CreateFile(Action, ".github/workflows/", "cmake.yml", Force);
+        CreateFile(GetContent("cmake.yml"), ".github/workflows/", "cmake.yml", Force);
         Git("add CMakeLists.txt");
         Git("add .github");
         Git("add install.sh");
     } else if(Type == "license") {
-        CreateFile(License, "LICENSE", Force);
+        CreateFile(GetContent("LICENSE"), "LICENSE", Force);
         Git("add LICENSE");
     } else if(Type == "gdb") {
         CreateFile(GDB, ".gdbinit", Force);
@@ -234,9 +238,7 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
         CreateFile(GitIgnore, ".gitignore", Force);
         Git("add .gitignore");
     } else if(Type == "readme") {
-        if(Name == "") throw "Passing a name is required for this operation";
-        CreateFile("# " + Name + " " + ReadMe1 + Name + ReadMe2 \
-                + Name + ReadMe3, "README.md", Force);
+        CreateFile(GetContent("README.md", Name), "README.md", Force);
         Git("add README.md");
     } else if(Type == "bash" || Type == "sh") {
         if(Name == "") throw "Passing a name is required for this operation";
@@ -309,6 +311,66 @@ void CreateFile(std::string Content, std::string Path, std::string Name, bool Fo
         k::MkDir(path);
     }
     k::WriteFileLines(Content, Path + "/" + Name);
+}
+
+std::string GetContent(std::string FileStandard, std::string Name) {
+    std::string Content;
+    std::string ProjectName = fs::current_path().filename();
+
+    std::string Line;
+    std::ifstream FileToRead(FileStandardsPath + "/" + FileStandard);
+    while(getline(FileToRead, Line)) {
+        std::string L = Line;
+        std::vector<std::string> Words;
+        k::SplitString(L, '$', Words, 0);
+        std::string LineOut;
+        for(std::string &Word: Words) {
+            if(Word == "Name") {
+                Word = Name;
+                Word[0] = toupper(Name[0]);
+            } else if(Word == "NAME") {
+                Word = Name;
+                for(int i(0); i<Word.size(); i++)
+                    Word[i] = toupper(Word[i]);
+            } else if(Word == "name")
+                Word = Name;
+            else if(Word == "programname")
+                Word = ProjectName;
+            else if(Word == "PROGRAMNAME") {
+                Word = ProjectName;
+                for(int i(0); i<Word.size(); i++)
+                    Word[i] = toupper(Word[i]);
+            } else if(Word == "year")
+                Word = Year;
+            LineOut = LineOut + Word;
+        }
+        Content = Content + LineOut + "\n";
+    }
+
+    FileToRead.close();
+    return Content;
+}
+
+std::string GetContent(std::string FileStandard) {
+    std::string Content;
+
+    std::string Line;
+    std::ifstream FileToRead(FileStandardsPath + "/" + FileStandard);
+    while(getline(FileToRead, Line)) {
+        std::string L = Line;
+        std::vector<std::string> Words;
+        k::SplitString(L, '$', Words, 0);
+        std::string LineOut;
+        for(std::string &Word: Words) {
+            if(Word == "year")
+                Word = Year;
+            LineOut = LineOut + Word;
+        }
+        Content = Content + LineOut + "\n";
+    }
+
+    FileToRead.close();
+    return Content;
 }
 
 // Copyright (c) 2023, Maxamilian Kidd-May
