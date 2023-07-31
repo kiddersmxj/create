@@ -195,16 +195,8 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
                 CreateFile(GetContent("main.cpp", Name), "src/", Name + ".cpp", Force);
                 CreateFile(GetContent("main.hpp", Name), "inc/", Name + ".hpp", Force);
             } else if(Additional == "class") {
-                std::string name = Name;
-                name[0] = toupper(name[0]);
-                CreateFile("#include \"../inc/" + Name + ".hpp\"\n\n" \
-                                    + name + "::" + name + "() {\n}"
-                                    + LicenseFooterSlash, "src/", Name + ".cpp", Force);
-                CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
-                                    + "\n\nclass " + name + " {\n    public:\n        " \
-                                    + name + "();" + "\n        ~" + name + "();\n    private:\n};" \
-                                    + "\n\n#endif" + LicenseFooterSlash, "inc/", \
-                                    Name + ".hpp", Force);
+                CreateFile(GetContent("class.cpp", Name), "src/", Name + ".cpp", Force);
+                CreateFile(GetContent("class.hpp", Name), "inc/", Name + ".hpp", Force);
             } else if(Additional == "struct") {
                 std::string name = Name;
                 name[0] = toupper(name[0]);
