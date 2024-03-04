@@ -28,7 +28,7 @@ target_link_libraries($name$
 )
 target_compile_features($name$ PUBLIC cxx_std_20)
 
-# Copyright (c) 2023, Maxamilian Kidd-May
+# Copyright (c) 2024, Maxamilian Kidd-May
 # All rights reserved.
 
 # This source code is licensed under the MIT license found in the
