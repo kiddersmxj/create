@@ -201,6 +201,7 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
                 std::string name = Name;
                 name[0] = toupper(name[0]);
                 CreateFile("#ifndef K" + Name + Name + "\n#define K" + Name + Name \
+                                    + "\n\n#include \"config.hpp\"" \
                                     + "\n\ntypedef struct {\n} " + name + ";" \
                                     + "\n\n#endif" + LicenseFooterSlash, "inc/", \
                                     Name + ".hpp", Force);
