@@ -27,6 +27,7 @@ void CreateFile(std::string Content, std::string Name, bool Force);
 void CreateFile(std::string Content, std::string Path, std::string Name, bool Force);
 std::string GetContent(std::string FileStandard, std::string Name);
 std::string GetContent(std::string FileStandard);
+void CMakeAdd(const std::string& cmakeFilePath, const std::string& filePathToAdd);
 
 #endif
 

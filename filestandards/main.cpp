@@ -55,19 +55,6 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void Usage() {
-    std::cout << UsageNotes << std::endl;
-}
-
-void Usage(std::string Message) {
-    std::cout << Message << std::endl;
-    std::cout << UsageNotes << std::endl;
-}
-
-void PrintVersion() {
-    std::cout << ProgramName << ": version " << Version << std::endl;
-}
-
 // Copyright (c) 2024, Maxamilian Kidd-May
 // All rights reserved.
 

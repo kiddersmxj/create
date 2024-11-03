@@ -2,12 +2,7 @@
 #define K_$NAME$
 
 #include "config.hpp"
-
 #include <getopt.h>
-
-void Usage();
-void Usage(std::string Message);
-void PrintVersion();
 
 #endif
 

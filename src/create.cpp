@@ -212,6 +212,7 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
             } else {
                 CreateFile(GetContent("source.cpp", Name), "src/", Name + ".cpp", Force);
                 CreateFile(GetContent("header.hpp", Name), "inc/", Name + ".hpp", Force);
+                CMakeAdd("./CMakeLists.txt", "src/" + Name + ".cpp");
             }
             Git("add src/" + Name + ".cpp");
             Git("add inc/" + Name + ".hpp");
@@ -369,6 +370,46 @@ std::string GetContent(std::string FileStandard) {
     FileToRead.close();
     return Content;
 }
+
+void CMakeAdd(const std::string& cmakeFilePath, const std::string& filePathToAdd) {
+    // Read the existing CMakeLists.txt content
+    std::ifstream cmakeFileIn(cmakeFilePath);
+    if (!cmakeFileIn.is_open()) {
+        throw std::runtime_error("Unable to open CMakeLists.txt file.");
+    }
+
+    std::ostringstream fileContents;
+    fileContents << cmakeFileIn.rdbuf();
+    cmakeFileIn.close();
+
+    std::string content = fileContents.str();
+
+    // Find the last occurrence of "target_sources"
+    size_t pos = content.rfind("target_sources");
+    if (pos == std::string::npos) {
+        throw std::runtime_error("target_sources section not found in CMakeLists.txt.");
+    }
+
+    // Find the closing parenthesis of the last target_sources block
+    size_t endPos = content.find(')', pos);
+    if (endPos == std::string::npos) {
+        throw std::runtime_error("Closing parenthesis for target_sources not found.");
+    }
+
+    // Insert the new file path with PRIVATE just before the closing parenthesis
+    std::string insertion = "    PRIVATE " + filePathToAdd + "\n";
+    content.insert(endPos, insertion);
+
+    // Write the modified content back to the file
+    std::ofstream cmakeFileOut(cmakeFilePath);
+    if (!cmakeFileOut.is_open()) {
+        throw std::runtime_error("Unable to write to CMakeLists.txt file.");
+    }
+
+    cmakeFileOut << content;
+    cmakeFileOut.close();
+}
+
 
 // Copyright (c) 2023, Maxamilian Kidd-May
 // All rights reserved.
