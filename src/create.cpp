@@ -189,6 +189,10 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
         if(Name == "config") { // config file
             CreateFile(GetContent("config.hpp", Name), "inc/" , Name + ".hpp", Force);
             Git("add inc/config.hpp");
+            CreateFile(GetContent("config.cpp", Name), "src/" , Name + ".cpp", Force);
+            Git("add src/config.cpp");
+            CreateFile(GetContent("config.conf", Name), "." , Name + ".conf", Force);
+            Git("add config.conf");
         } else {
             if(Name == "") throw "Passing a name is required for this operation";
             if(Additional == "main") { // TODO add classes/stucts

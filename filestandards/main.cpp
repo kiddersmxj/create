@@ -1,6 +1,7 @@
 #include "../inc/$name$.hpp"
 
 int main(int argc, char** argv) {
+    InitConfig();
     int HelpFlag = 0;
     int VersionFlag = 0;
     int opt;

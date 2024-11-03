@@ -31,6 +31,7 @@ target_compile_features($name$ PUBLIC cxx_std_20)
 
 target_sources($name$
     PRIVATE src/$name$.cpp
+    PRIVATE src/config.cpp
 )
 
 # Copyright (c) 2024, Maxamilian Kidd-May

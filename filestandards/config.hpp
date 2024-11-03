@@ -4,12 +4,26 @@
 #include <iostream>
 #include <std-k.hpp>
 
+// Define configuration variables with or without default values using inline
+inline std::vector<std::string> ExampleArray = {};
+inline std::string ExampleString;
+inline bool ExampleBool;
+inline int ExampleInt;
+
+const std::string ConfigFilePath = "config.conf";
+// Function to initialize global configuration variables
+int InitConfig();
+
 const std::string ProgramName = "$programname$";
 const std::string Version = "0.0.0";
 const std::string UsageNotes = R"(usage: $programname$ [ -h/-v ]
 options:
     -h / --help         show help and usage notes
     -v / --version      print version and exit)";
+
+void Usage();
+void Usage(std::string Message);
+void PrintVersion();
 
 #endif
 
