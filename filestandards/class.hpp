@@ -1,3 +1,6 @@
+#ifndef K_$NAME$
+#define K_$NAME$
+
 #include "config.hpp"
 
 class $Name$ {
@@ -6,6 +9,8 @@ class $Name$ {
         ~$Name$();
     private:
 };
+
+#endif
 
 // Copyright (c) 2024, Maxamilian Kidd-May
 // All rights reserved.
