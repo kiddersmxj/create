@@ -20,6 +20,7 @@ options:
     -m / --main         for c/cpp add a main & respective header
     -C / --class        for c/cpp add a class & respective header
     -S / --struct       for c/cpp add a struct header
+    -q / --quickstart   for c/cpp start a project with install and main
     -f / --force        force even if files exist)";
 const std::string Version = "1.0.0";
 const std::vector<std::string> TypeList = { "cpp", "cmake", "license", "gdb", "gitignore", "readme", "bash", "sh", "python", "py" };

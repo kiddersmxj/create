@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
     int ForceFlag = 0;
     int TestFlag = 0;
     bool Force = 0;
+    int QuickstartFlag = 0;
     int AdditionalFlag = 0;
     std::string Additional = "";
     std::string Type = "";
@@ -28,12 +29,13 @@ int main(int argc, char** argv) {
         { "type", required_argument, NULL, 't' },
         { "name", required_argument, NULL, 'n' },
         { "test", no_argument, &TestFlag, 1 },
+        { "quickstart", no_argument, &QuickstartFlag, 1 },
         { 0 }
     };
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcafmCSt:n:", Opts, 0);
+        opt = getopt_long(argc, argv, "qhvcafmCSt:n:", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -88,6 +90,9 @@ int main(int argc, char** argv) {
             AdditionalFlag++;
             Additional = "struct";
             break;
+        case 'q':
+            QuickstartFlag = 1;
+            break;
         case '?':
             Usage();
             return EXIT_FAILURE;
@@ -126,8 +131,25 @@ int main(int argc, char** argv) {
             }
         }
     }
+
     if(AddFlag) {
-        try { Add(Name, Type, Additional, Force); }
+        try { Add(Name, Type, Additional, Force, QuickstartFlag); }
+        catch(std::string Message) {
+            Usage(Message);
+            return EXIT_FAILURE;
+        }
+        catch(const char *Message) {
+            Usage(Message);
+            return EXIT_FAILURE;
+        }
+    }
+
+    if(QuickstartFlag) {
+        try { 
+            SetupDirinDir(Name);
+            Add(Name, "cpp", "main", Force, QuickstartFlag);
+            Add(Name, "sh", "install", Force, QuickstartFlag);
+        }
         catch(std::string Message) {
             Usage(Message);
             return EXIT_FAILURE;
@@ -174,17 +196,17 @@ void SetupDirinDir(std::string Name) {
 
 void BuildFS(std::string Name, std::string Type, bool Force) {
     SetupDir(Name);
-    Add(Name, "cpp", "main", Force);
-    Add("config", "cpp", "", Force);
-    Add(Name, "cmake", "", Force);
-    Add(Name, "readme", "", Force);
-    Add("", "gdb", "", Force);
-    Add("", "gitignore", "", Force);
-    Add("", "license", "", Force);
+    Add(Name, "cpp", "main", Force, 0);
+    Add("config", "cpp", "", Force, 0);
+    Add(Name, "cmake", "", Force, 0);
+    Add(Name, "readme", "", Force, 0);
+    Add("", "gdb", "", Force, 0);
+    Add("", "gitignore", "", Force, 0);
+    Add("", "license", "", Force, 0);
     CreateRepo(Name);
 }
 
-void Add(std::string Name, std::string Type, std::string Additional, bool Force) {
+void Add(std::string Name, std::string Type, std::string Additional, bool Force, int Quickstart) {
     if(Type == "cpp") {
         if(Name == "config") { // config file
             CreateFile(GetContent("config.hpp", Name), "inc/" , Name + ".hpp", Force);
@@ -196,8 +218,12 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
         } else {
             if(Name == "") throw "Passing a name is required for this operation";
             if(Additional == "main") { // TODO add classes/stucts
-                CreateFile(GetContent("main.cpp", Name), "src/", Name + ".cpp", Force);
-                CreateFile(GetContent("main.hpp", Name), "inc/", Name + ".hpp", Force);
+                if(Quickstart) {
+                    CreateFile("#include <iostream>\n\nint main(int argc, char** argv) {\n}" + LicenseFooterSlash, "./", Name + ".cpp", Force);
+                } else {
+                    CreateFile(GetContent("main.cpp", Name), "src/", Name + ".cpp", Force);
+                    CreateFile(GetContent("main.hpp", Name), "inc/", Name + ".hpp", Force);
+                }
             } else if(Additional == "class") {
                 CreateFile(GetContent("class.cpp", Name), "src/", Name + ".cpp", Force);
                 CreateFile(GetContent("class.hpp", Name), "inc/", Name + ".hpp", Force);
@@ -240,9 +266,14 @@ void Add(std::string Name, std::string Type, std::string Additional, bool Force)
         Git("add README.md");
     } else if(Type == "bash" || Type == "sh") {
         if(Name == "") throw "Passing a name is required for this operation";
-        CreateFile("#!/bin/bash\n", Name + ".sh", Force);
-        int result = k::ExecCmd("chmod +x " + Name + ".sh");
-        Git("add" + Name + ".sh");
+        if (Additional == "install") {
+            CreateFile("#!/bin/bash\n\ng++ " + Name + ".cpp -o " + Name, "install.sh", Force);
+            int result = k::ExecCmd("chmod +x install.sh");
+        } else {
+            CreateFile("#!/bin/bash\n", Name + ".sh", Force);
+            int result = k::ExecCmd("chmod +x " + Name + ".sh");
+            Git("add" + Name + ".sh");
+        }
     } else if(Type == "python" || Type == "py") {
         if(Name == "") throw "Passing a name is required for this operation";
         CreateFile(Python, Name + ".py", Force);
