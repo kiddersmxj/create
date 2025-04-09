@@ -1,1 +1,1 @@
-# $Name$ [![CMake](https://img.shields.io/github/actions/workflow/status/kiddersmxj/$name$/cmake.yml?style=for-the-badge)](https://github.com/kiddersmxj/$name$/actions/workflows/cmake.yml)
+# $#$Name$#$ [![CMake](https://img.shields.io/github/actions/workflow/status/kiddersmxj/$#$name$#$/cmake.yml?style=for-the-badge)](https://github.com/kiddersmxj/$#$name$#$/actions/workflows/cmake.yml)

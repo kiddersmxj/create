@@ -1,4 +1,4 @@
-#include "../inc/$name$.hpp"
+#include "../inc/$#$name$#$.hpp"
 
 // Copyright (c) 2024, Maxamilian Kidd-May
 // All rights reserved.

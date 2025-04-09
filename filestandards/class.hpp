@@ -1,12 +1,12 @@
-#ifndef K_$NAME$
-#define K_$NAME$
+#ifndef K_$#$NAME$#$
+#define K_$#$NAME$#$
 
 #include "config.hpp"
 
-class $Name$ {
+class $#$Name$#$ {
     public:
-        $Name$();
-        ~$Name$();
+        $#$Name$#$();
+        ~$#$Name$#$();
     private:
 };
 

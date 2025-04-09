@@ -1,5 +1,5 @@
-#ifndef K_$NAME$
-#define K_$NAME$
+#ifndef K_$#$NAME$#$
+#define K_$#$NAME$#$
 
 #include "config.hpp"
 #include <getopt.h>

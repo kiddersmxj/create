@@ -1,21 +1,24 @@
-#include "../inc/$name$.hpp"
+#include "../inc/$#$name$#$.hpp"
 
 int main(int argc, char** argv) {
     InitConfig();
+
+    int opt;
     int HelpFlag = 0;
     int VersionFlag = 0;
-    int opt;
+    std::string Type = "";
 
     // Get opt option defenitions
     struct option Opts[] = {
         { "help", no_argument, &HelpFlag, 1 },
         { "version", no_argument, &VersionFlag, 1 },
+        { "type", required_argument, NULL, 't' },
         { 0 }
     };
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hv", Opts, 0);
+        opt = getopt_long(argc, argv, "hvt:", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -32,6 +35,9 @@ int main(int argc, char** argv) {
             break;
         case 'v':
             VersionFlag = 1;
+            break;
+        case 't':
+            Type = optarg;
             break;
         case '?':
             Usage();

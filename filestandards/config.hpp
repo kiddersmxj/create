@@ -1,5 +1,5 @@
-#ifndef K_CONFIG_$PROGRAMNAME$
-#define K_CONFIG_$PROGRAMNAME$
+#ifndef K_CONFIG_$#$PROGRAMNAME$#$
+#define K_CONFIG_$#$PROGRAMNAME$#$
 
 #include <iostream>
 #include <std-k.hpp>
@@ -14,9 +14,9 @@ const std::string ConfigFilePath = "config.conf";
 // Function to initialize global configuration variables
 int InitConfig();
 
-const std::string ProgramName = "$programname$";
+const std::string ProgramName = "$#$programname$#$";
 const std::string Version = "0.0.0";
-const std::string UsageNotes = R"(usage: $programname$ [ -h/-v ]
+const std::string UsageNotes = R"(usage: $#$programname$#$ [ -h/-v ]
 options:
     -h / --help         show help and usage notes
     -v / --version      print version and exit)";

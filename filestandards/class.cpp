@@ -1,9 +1,9 @@
-#include "../inc/$name$.hpp"
+#include "../inc/$#$name$#$.hpp"
 
-$Name$::$Name$() {
+$#$Name$#$::$#$Name$#$() {
 }
 
-$Name$::~$Name$() {
+$#$Name$#$::~$#$Name$#$() {
 }
 
 // Copyright (c) 2024, Maxamilian Kidd-May
