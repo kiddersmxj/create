@@ -30,6 +30,9 @@ const std::string Sh = R"( > /dev/null 2>&1)";
 const std::string BasePath = HOME + "/devel/";
 const std::string FileStandardsPath = HOME + "/.cache/create/filestandards/";
 
+// String to suround filestandard vars in
+const std::string DelimString = "$#$";
+
 const std::string LicenseFooterHash = R"(
 
 # Copyright (c) 2023, Maxamilian Kidd-May

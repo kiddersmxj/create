@@ -351,7 +351,7 @@ std::string GetContent(std::string FileStandard, std::string Name) {
     while(getline(FileToRead, Line)) {
         std::string L = Line;
         std::vector<std::string> Words;
-        k::SplitString(L, "$#$", Words, 0);
+        k::SplitString(L, DelimString, Words, 0);
         std::string LineOut;
         for(std::string &Word: Words) {
             if(Word == "Name") {
@@ -388,7 +388,7 @@ std::string GetContent(std::string FileStandard) {
     while(getline(FileToRead, Line)) {
         std::string L = Line;
         std::vector<std::string> Words;
-        k::SplitString(L, "$#$", Words, 0);
+        k::SplitString(L, DelimString, Words, 0);
         std::string LineOut;
         for(std::string &Word: Words) {
             if(Word == "year")
