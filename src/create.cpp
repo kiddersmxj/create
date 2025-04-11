@@ -116,6 +116,7 @@ int main(int argc, char** argv) {
         /* std::cout << "Current suported types:" << std::endl; */
         for(std::string s: TypeList)
             std::cout << s << std::endl;
+        return EXIT_SUCCESS;
     }
 
     if(CreateFlag) {
@@ -130,6 +131,7 @@ int main(int argc, char** argv) {
                 return EXIT_FAILURE;
             }
         }
+        return EXIT_SUCCESS;
     }
 
     if(AddFlag) {
@@ -142,6 +144,7 @@ int main(int argc, char** argv) {
             Usage(Message);
             return EXIT_FAILURE;
         }
+        return EXIT_SUCCESS;
     }
 
     if(QuickstartFlag) {
@@ -158,15 +161,18 @@ int main(int argc, char** argv) {
             Usage(Message);
             return EXIT_FAILURE;
         }
+        return EXIT_SUCCESS;
     }
 
     if(TestFlag) {
         GetContent("CMakeLists.txt", "ajj");
         GetContent("LICENSE");
         GetContent("install.sh");
+        return EXIT_SUCCESS;
     }
 
-    return EXIT_SUCCESS;
+    Usage();
+    return EXIT_FAILURE;
 }
 
 void Usage() {

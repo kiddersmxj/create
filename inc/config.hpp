@@ -8,7 +8,7 @@ const std::string ProgramName = "create";
 const time_t now = time(0);
 inline const tm *ltm = localtime(&now);
 const std::string Year = std::to_string(1900 + ltm->tm_year);
-const std::string UsageNotes = R"(usage: create [ -h/-v ] [ -a/-c ] [ -t language ]
+const std::string UsageNotes = R"(usage: create [ -h/-v ] [ -a/-c/-q ] [ -t language ]
               [ -n name ] [ -C/-S/-M ] [ -f ]
 options:
     -h / --help         show help and usage notes
