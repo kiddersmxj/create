@@ -41,7 +41,7 @@ set(PRGM_CONF_INSTALL_DIR ""
     CACHE STRING "Directory (relative to the user home) where the $#$name$#$ configuration file will be installed")
   set(PRGM_CONF_FILE_NAME "$#$name$#$.conf" 
     CACHE STRING "The desired $#$name$#$ configuration file name")
-  set(PRGM_SOURCE_FILE "$#${CMAKE_SOURCE_DIR}/$#$name$#$.conf" 
+  set(PRGM_SOURCE_FILE "${CMAKE_SOURCE_DIR}/$#$name$#$.conf"
     CACHE FILEPATH "Path to the source $#$name$#$ configuration file")
 
 install(CODE "
