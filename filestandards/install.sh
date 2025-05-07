@@ -4,7 +4,9 @@ if [[ $1 != "" ]]; then
     ARGS="-D$1"
 fi
 
-cmake -B build $ARGS && cmake --build build && sudo cmake --install build
+mkdir -p build
+script -q -c "cmake -B build $ARGS && cmake --build build && sudo cmake --install build" | tee build/build.log
+
 
 # Copyright (c) 2024, Maxamilian Kidd-May
 # All rights reserved.
