@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
     int opt;
     int HelpFlag = 0;
     int VersionFlag = 0;
-    std::string Type = "";
+    std::string Test = "";
 
     // Get opt option defenitions
     struct option Opts[] = {
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
             VersionFlag = 1;
             break;
         case 't':
-            Type = optarg;
+            Test = optarg;
             break;
         case '?':
             Usage();
